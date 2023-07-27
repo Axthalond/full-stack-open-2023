@@ -1,20 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Numbers from "./components/Numbers";
+import axios from 'axios'
 
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", id: 1, number: "040-1234567" },
-    { name: "Ada Lovelace", id: 2, number: "39-44-5323523" },
-    { name: "Dan Abramov", id: 3, number: "12-43-234345" },
-    { name: "Mary Poppendieck", id: 4, number: "39-23-6423122" },
-  ]);
-
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("name");
   const [newNumber, setNewNumber] = useState("number");
   const [filterQuery, setFilterQuery] = useState(" ");
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  })
 
   const handleChange = (setValue) => (event) => setValue(event.target.value);
 
@@ -45,7 +48,7 @@ const App = () => {
         handleChange={handleChange(setFilterQuery)}
       />
 
-      <h33>Add a new</h33>
+      <h3>Add a new</h3>
 
       <PersonForm 
         name={newName} 
