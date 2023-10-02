@@ -1,6 +1,6 @@
 const router = require('express').Router()
-const persons = require('../data.js')
-
+let persons = require('../data.js')
+var morgan = require('morgan')
 
 //Tools
 const generateId = () => {
@@ -10,11 +10,18 @@ const generateId = () => {
 
   return maxId + 1
 }
+
+morgan.token('content', function getId (req) {
+  const personJSON = JSON.stringify(req.body)
+  return personJSON
+})
 //Tools end
 
 
 
 //Services
+
+router.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 router.get('/', (request, response) => {
   response.json(persons)
@@ -37,15 +44,17 @@ router.delete('/:id', (request, response) => {
   response.status(200).json({message:`person with id ${id} was deleted`}).end()
 })
 
-
-
-
 router.post('/', (request, response) => {
   const body = request.body
+
   if(!body.name) {
     return response.status(400).json({
-      error: 'content missing'
+      error: 'name missing'
     })
+  } 
+
+  if (persons.find(person => person.name === body.name)){
+    return response.status(400).json({error:`${body.name} is already in the phonebook`})
   }
 
   const person = {

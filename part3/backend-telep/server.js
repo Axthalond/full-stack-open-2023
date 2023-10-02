@@ -1,13 +1,20 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const persons = require('./data.js')
-
+var morgan = require('morgan')
 
 //Server set up
 const app = express()
 app.use(bodyParser.json())
 
 //Server set up end
+
+//Tools
+const unknownEndPoint = (request, response) => {
+  response.status(404).send({error: 'unknown endpoint'})
+}
+
+//Tools - end
 
 
 //Routes
@@ -19,7 +26,6 @@ app.use('/api/persons', personRouter)
 //Services
 app.get('/', (request, response) => {
   response.send('<h1>Hello world</h1>')
-  console.log('get funciona');
 })
 
 app.get('/info', (request, response) => {
@@ -28,6 +34,10 @@ app.get('/info', (request, response) => {
 
   response.send(`<div>Phonebook has info for ${numberOfEntries} people <br></br>${date}<div>`)
 })
+
+app.use(morgan('tiny'))
+
+app.use(unknownEndPoint)
 //Services end
 
 
